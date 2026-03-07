@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Face Profiling App</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body{
+background: linear-gradient(135deg,#1f4037,#99f2c8);
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.container{
+background:white;
+padding:40px;
+border-radius:15px;
+width:500px;
+text-align:center;
+box-shadow:0 15px 35px rgba(0,0,0,0.25);
+}
+
+h1{
+color:#333;
+margin-bottom:10px;
+}
+
+.subtitle{
+color:#666;
+font-size:14px;
+margin-bottom:25px;
+}
+
+input[type="file"]{
+padding:10px;
+border:1px solid #ccc;
+border-radius:6px;
+width:100%;
+margin-bottom:15px;
+background:#f9f9f9;
+cursor:pointer;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#1f4037;
+color:white;
+border:none;
+border-radius:6px;
+font-size:16px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#16332c;
+transform:scale(1.03);
+}
+
+#result{
+margin-top:25px;
+}
+
+#profile{
+font-size:18px;
+color:#1f4037;
+font-weight:bold;
+margin-bottom:15px;
+}
+
+img{
+max-width:100%;
+border-radius:10px;
+border:3px solid #1f4037;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+display:none;
+}
+
+.loading{
+color:#555;
+font-style:italic;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Face Profiling App</h1>
+<p class="subtitle">Upload an image to detect face profile</p>
+
+<input type="file" id="imageInput" accept="image/*">
+
+<button onclick="uploadImage()">Upload & Detect</button>
+
+<div id="result">
+
+<p id="profile"></p>
+
+<img id="resultImage" src="" alt="Result Image">
+
+</div>
+
+</div>
+
+<script>
+
+async function uploadImage() {
+
+const input = document.getElementById('imageInput');
+
+if (input.files.length === 0) {
+alert("Please select an image!");
+return;
+}
+
+const file = input.files[0];
+const formData = new FormData();
+formData.append("image", file);
+
+document.getElementById('profile').innerHTML = "Detecting...";
+document.getElementById('resultImage').style.display = "none";
+
+try {
+
+const response = await fetch('/upload', {
+method: 'POST',
+body: formData
+});
+
+const data = await response.json();
+
+if (data.error) {
+document.getElementById('profile').innerHTML = data.error;
+return;
+}
+
+document.getElementById('profile').innerHTML = data.profile;
+
+const img = document.getElementById('resultImage');
+
+img.src = data.image + "?t=" + new Date().getTime();
+
+img.style.display = "block";
+
+} catch (err) {
+
+document.getElementById('profile').innerHTML = "Error detecting face.";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
